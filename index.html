@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html data-lang="en">
+    <head>
+        <meta name="google-site-verification" content="XuVJsdbgmTRePoSfbI4uWDJxmLOq2B8K8iJbrMWnsUs" />
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <link href="style.css" rel="stylesheet">
+        <title>Sowing the seeds</title>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
+        
+        <style>
+          .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.761);
+            transition: .4s;
+            border-radius: 24px;
+            border: var(--bor);
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: black;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: rgba(255, 255, 255, 0.761);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .lang-vi [data-lang="vi"] { display: block; }
+        .lang-vi [data-lang="en"] { display: none; }
+        .lang-en [data-lang="en"] { display: block; }
+        .lang-en [data-lang="vi"], 
+        body:not(.lang-vi) [data-lang="vi"] { display: none; }
+        </style>
+    </head>
+<body>
+    <div class="language-switcher">
+        <select id="languageSelect" onchange="changeLanguage(this.value)">
+            <option value="en">English</option>
+            <option value="vi">Tiếng Việt</option>
+        </select>
+    </div>
+
+    <div id="inactivityOverlay" style="display: none;"></div>
+    <div id="inactivityPopup" style="display: none;">
+        <p data-lang="en">You have been inactive for a while.</p>
+        <p data-lang="vi">Bạn đã không hoạt động trong một thời gian.</p>
+        <p>
+            <span data-lang="en">Page will refresh in</span>
+            <span data-lang="vi">Trang sẽ làm mới trong</span>
+            <span id="inactivityCountdown">10</span>
+            <span data-lang="en">seconds.</span>
+            <span data-lang="vi">giây.</span>
+        </p>
+        <button id="cancelInactivityButton">
+            <span data-lang="en">Cancel</span>
+            <span data-lang="vi">Hủy</span>
+        </button>
+    </div>
+
+    <div id="starContainer">
+        <div id="headRectangle">
+            You are <br> a <br> sparkly <br> soul
+           
+        </div>
+    </div>
+
+    <div class="new">
+        <canvas id="scribbleCanvas"></canvas>
+        <video class="input_video"></video>
+    </div>
+
+    <div class="a1" id="first">
+        <h2>
+      
+           Gieo Hạt
+        </h2>
+        <button onclick="showAlert()">
+            <span data-lang="en">About the project</span>
+            <span data-lang="vi">Về dự án</span>
+        </button>
+        <div style="display: none;" id="switch">
+            <h4>
+                <span data-lang="en">Hide the UI</span>
+                <span data-lang="vi">Ẩn giao diện</span>
+            </h4>
+            <label class="switch">
+                <input type="checkbox" id="toggleButton">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="a2" id="gui">
+        <div class="pcss" id="p1">
+            <h5>
+                <span data-lang="en">Choose your garden</span>
+                <span data-lang="vi">Chọn khu vườn của bạn</span>
+            </h5>
+            <div id="gap1">
+                <button id="button1">I</button>
+                <button id="button2">II</button>
+            </div>
+        </div>
+
+        <div class="pcss" id="p2">
+            <div id="gap">
+                <input type="color" id="colorPicker" value="#ffffff">
+                <input type="color" id="colorPicker2" value="#ada9e5">
+                <h5>
+                    <span data-lang="en">Change colors</span>
+                    <span data-lang="vi">Đổi màu</span>
+                </h5>
+            </div>
+        </div>
+
+        <div style="display: none;" class="pcss" id="p4">
+            <h5></h5>
+            <input type="color" id="colorPicker5" value="#ff0000">
+        </div>
+
+        <div style="display: none;" class="pcss" id="p5">
+            <h5></h5>
+            <form id="textForm">
+                <label for="textInput">
+                    <span data-lang="en">What are you thinking?</span>
+                    <span data-lang="vi">Bạn đang nghĩ gì?</span>
+                </label>
+                <textarea id="textInput" name="textInput">
+                    <span data-lang="en">Spill the beans...</span>
+                    <span data-lang="vi">Hãy chia sẻ...</span>
+                </textarea>
+                <button type="submit">
+                    <span data-lang="en">Add your thoughts</span>
+                    <span data-lang="vi">Thêm suy nghĩ của bạn</span>
+                </button>
+            </form>
+            <span>
+                <span data-lang="en">Visualising with your mind's eyes</span>
+                <span data-lang="vi">Hình dung bằng mắt tâm trí của bạn</span>
+            </span>
+            <input type="color" id="colorPicker1" value="#11ff00">
+
+            <div class="range-container">
+                <label for="opacityRange"></label>
+                <input type="range" min="0.1" max="0.5" step="0.1" value="0.3" id="opacityRange">
+                <label for="sizeRange"></label>
+                <input type="range" min="10" max="25" value="20" id="sizeRange">
+            </div>
+        </div>
+
+        <button id="refreshButton">
+            <span data-lang="en">Start Over</span>
+            <span data-lang="vi">Bắt đầu lại</span>
+        </button>
+    </div>
+
+    <div class="a4" id="gui">
+        <h5>
+            <span data-lang="en">How to interact</span>
+            <span data-lang="vi">Cách tương tác</span>
+        </h5>
+        <span id="mt">
+            <span data-lang="en">1. Move to create random patterns<br>2. Click on 3D Models to plant<br>3. Scroll mouse wheel to zoom</span>
+            <span data-lang="vi">1. Di chuyển để tạo họa tiết ngẫu nhiên<br>2. Click lên 3D Models để trồng cây<br>3. Scroll mouse wheel để zoom</span>
+        </span>
+        <span id="mb">
+            <span data-lang="en">Use fingers to zoom in & out</span>
+            <span data-lang="vi">Sử dụng ngón tay để thu nhỏ & phóng to</span>
+        </span>
+    </div>
+
+    <div class="a3" id="shot">
+        <div id="social">
+            <h5>
+                <span data-lang="en">Author</span>
+                <span data-lang="vi">Tác giả</span>
+            </h5>
+            <button onclick="window.open('https://www.instagram.com/voth000/','vothDm');">@voth000</button>
+        </div>
+        <div id="gth">
+            <span data-lang="en">Artwork created by @Voth000 for Ô 2024 Exhibition: "HOPE - Between Despair & Renewal"</span>
+            <span data-lang="vi">Tác phẩm được tạo ra bởi @Voth000 dành cho triển lãm Ô 2024: "HOPE - Between Despair & Renewal"</span>
+        </div>
+    </div>
+
+    <div class="poster">
+        <div class="container"></div>
+        <div id="three-container"></div>
+        <div id="alertContainer"></div>
+    </div>
+
+    <div id="pop">
+        <div id="overlay" class="overlay" onclick="hideAlert()"></div>
+        <div id="popup" class="popup">
+            <h3>
+                <span data-lang="en">"Sowing Light Seeds into Life, Harvesting Sweet Fruits for Rebirth."</span>
+                <span data-lang="vi">"Gieo Hạt Ánh Sáng vào Cuộc Sống, Gặt Hái Trái Ngọt để Tái Sinh."</span>
+            </h3>
+            <h5>
+                <span data-lang="en">About the Project</span>
+                <span data-lang="vi">Giới thiệu về dự án</span>
+            </h5>
+            <span>
+                <span data-lang="en">This is a series of websites about Rebirth & Hope, the first version participated in @bapxao.oi exhibition: "Light Up the Burnt Out" in August 2023. And now, the second version is participating in Ô 2024 Exhibition: "HOPE - Between Despair & Renewal"</span>
+                <span data-lang="vi">Đây là một series website về Rebirth & Hope, phiên bản đầu tiên tham gia triển lãm của @bapxao.oi: "Light Up the Burnt Out" vào tháng 08/2023 Và hiện tại, phiên bản thứ hai tham gia vào triển lãm Ô 2024: "HOPE - Between Despair & Renewal"</span>
+            </span>
+            <h5>
+                <span data-lang="en">About the Artwork</span>
+                <span data-lang="vi">Về tác phẩm</span>
+            </h5>
+            <span>
+                <span data-lang="en">Sowing the Seeds is an interactive installation with the message "Sowing Light Seeds and Life, Harvesting Sweet Fruits of Rebirth." Created by @voth000, "Sowing the Seeds" allows viewers to interact with 3D objects that melt and return to their original shape, symbolizing the relationship between life and death, the cycle of human life, being born and passing away, falling and rising.</span>
+                <span data-lang="vi">Sowing the Seeds là một tác phẩm sắp đặt tương tác với thông điệp "Gieo Hạt Ánh Sáng và Cuộc Sống, Gặt Hái Trái Ngọt Tái Sinh." Được tạo ra bởi @voth000, "Sowing the Seeds" cho phép người xem tương tác với các vật thể 3D tan chảy rồi lại trở lại với hình dáng ban đầu tượng trưng cho tương quan giữa sự sống và cái chết, vòng tuần hoàn của 1 đời người, được sinh ra và mất đi, vấp ngã và đứng lên.</span>
+            </span>
+            <h5>
+                <span data-lang="en">Sowing Seeds</span>
+                <span data-lang="vi">Gieo Hạt</span>
+            </h5>
+            <span>
+                <span data-lang="en">Viewers can plant flowers on glowing 3D objects that melt, and move around the artwork, creating random but complete patterns. The work reminds us that everyone's life is imperfect and different, but each of us is special and is seeking opportunities to regenerate and renew ourselves to find our own light.</span>
+                <span data-lang="vi">Người xem có thể trồng hoa trên vật thể 3D tỏa sáng lấp lánh rồi tan chảy, và di chuyển xung quanh tác phẩm, tạo ra những họa tiết ngẫu nhiên nhưng hoàn chỉnh. Tác phẩm nhắc nhở rằng cuộc sống của mỗi người đều không hoàn hảo và khác biệt, nhưng mỗi chúng ta là những cá thể đặc biệt và đều đang tìm kiếm cơ hội tái tạo và làm mới bản thân để tìm được ánh sáng của chính mình.</span>
+            </span>
+            <h5>
+                <span data-lang="en">Thank you for visiting the exhibition and reading this note</span>
+                <span data-lang="vi">Cảm ơn bạn đã đến triển lãm và đọc hết ghi chú này</span>
+            </h5>
+            <p style="font-size: 10px; text-align:right;">
+                <span data-lang="en">"Click outside the box to close."</span>
+                <span data-lang="vi">"Click bên ngoài hộp để đóng."</span>
+            </p>
+        </div>
+    </div>
+
+    <div id="up" class="up">
+      <div class="up-content">
+          <h2>
+              <span data-lang="en">Thank you for visiting your own flower garden</span>
+              <span data-lang="vi">Cảm ơn bạn đã ghé thăm vườn bông của chính mình</span>
+          </h2>
+          <p>
+              <span data-lang="en">Click on the 3D model behind this popup<br>to start sowing seeds in your garden.</span>
+              <span data-lang="vi">Hãy click vào 3D model phía sau popup này<br>để bắt đầu gieo hạt trong khu vườn của bạn.</span>
+          </p>
+          <div class="language-choice" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(0, 0, 0, 0.1); display: flex; align-items: center; justify-content: center; gap: 10px;">
+            
+              <span style="font-size: 0.9em;">EN</span>
+              <label class="switch">
+                  <input type="checkbox" id="languageToggle">
+                  <span class="slider"></span>
+              </label>
+              <span style="font-size: 0.9em;">VI</span>
+          </div>
+      </div>
+  </div>
+    
+
+  <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+        <script type="importmap">
+          {
+            "imports": {
+              "three": "https://unpkg.com/three@0.150.1/build/three.module.js",
+              "three/addons/": "https://unpkg.com/three@0.150.1/examples/jsm/"
+            }
+          }
+        </script>
+<script src="index.js" type="module"></script>
+<script src="./main.js"></script>
+<script src="
+https://cdn.jsdelivr.net/npm/noisejs@2.1.0/index.min.js
+"></script>
+
+</body>
+</html>
